@@ -5,12 +5,15 @@ import {
 } from '@ngrx/store';
 import { environment } from '../../environments/environment';
 import { routerReducer } from '@ngrx/router-store';
+import { AuthState, authReducer } from '../auth/reducers';
 
 export interface AppState {
-
+    auth: AuthState;
+    router: ReturnType<typeof routerReducer>;
 }
 
 export const reducers: ActionReducerMap<AppState> = {
+    auth: authReducer,
     router: routerReducer
 };
 

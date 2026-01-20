@@ -7,7 +7,9 @@ import { map } from 'rxjs/operators';
 
 
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class NotesDataService extends DefaultDataService<Note> {
 
 
@@ -18,7 +20,7 @@ export class NotesDataService extends DefaultDataService<Note> {
     entityUrl = '/api/notes/';
 
     getAll(): Observable<Note[]> {
-        return this.http.get('/api/notes')
+        return this.http.get<Note[]>('/api/notes')
             .pipe(
                 map((notes: Note[]) => notes)
             );

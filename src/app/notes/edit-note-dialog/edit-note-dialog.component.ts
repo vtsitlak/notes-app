@@ -1,33 +1,39 @@
-import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { ChangeDetectionStrategy, Component, Inject, inject } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogRef, MatDialogTitle, MatDialogContent, MatDialogActions } from '@angular/material/dialog';
 import { Note } from '../model/note';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Observable } from 'rxjs';
-import { NoteEntityService } from '../services/note-entity.service';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { NotesStore } from '../notes.store';
+import { CdkScrollable } from '@angular/cdk/scrolling';
+import { NgIf } from '@angular/common';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { MatFormField, MatInput } from '@angular/material/input';
+import { MatSlideToggle } from '@angular/material/slide-toggle';
+import { MatButton } from '@angular/material/button';
 
 @Component({
     selector: 'note-dialog',
     templateUrl: './edit-note-dialog.component.html',
     styleUrls: ['./edit-note-dialog.component.scss'],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    standalone: true,
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [MatDialogTitle, CdkScrollable, MatDialogContent, NgIf, MatProgressSpinner, ReactiveFormsModule, MatFormField, MatInput, MatSlideToggle, MatDialogActions, MatButton]
 })
 export class EditNoteDialogComponent {
 
-    form: FormGroup;
+    form!: FormGroup;
 
-    dialogTitle: string;
+    dialogTitle!: string;
 
-    note: Note;
+    note!: Note;
 
-    mode: 'create' | 'update';
+    mode!: 'create' | 'update';
 
-    loading$: Observable<boolean>;
+    notesStore = inject(NotesStore);
 
     constructor(
         private fb: FormBuilder,
         private dialogRef: MatDialogRef<EditNoteDialogComponent>,
-        @Inject(MAT_DIALOG_DATA) data,
-        private notesService: NoteEntityService) {
+        @Inject(MAT_DIALOG_DATA) data: any) {
 
         this.dialogTitle = data.dialogTitle;
         this.note = data.note;
@@ -61,29 +67,13 @@ export class EditNoteDialogComponent {
         };
 
         if (this.mode === 'update') {
-
-            this.notesService.update(note);
-
+            this.notesStore.update({ noteId: note.id, changes: this.form.value });
             this.dialogRef.close();
         } else if (this.mode === 'create') {
-
-            note.created = Date();
-
-            this.notesService.add(note)
-                .subscribe(
-                    newNote => {
-
-                        console.log('New Note', newNote);
-
-                        this.dialogRef.close();
-
-                    }
-                );
-
+            note.created = new Date().toISOString();
+            note.id = Math.max(...this.notesStore.notes().map(n => n.id), 0) + 1;
+            this.notesStore.add(note);
+            this.dialogRef.close();
         }
-
-
     }
-
-
 }

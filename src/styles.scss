@@ -1,22 +1,26 @@
 /* You can add global styles to this file, and also import other style files */
 
-
-
-@import "~@angular/material/theming";
+@use '@angular/material' as mat;
 @import url("https://fonts.googleapis.com/icon?family=Material+Icons");
 
 // Include non-theme styles for core.
-@include mat-core();
+@include mat.core();
 
 // Define a theme.
-$primary: mat-palette($mat-grey);
-$accent:  mat-palette($mat-light-blue, 600, 300, 600);
-$warn:    mat-palette($mat-deep-orange, 300, 500, 800);
+$primary: mat.m2-define-palette(mat.$m2-grey-palette);
+$accent: mat.m2-define-palette(mat.$m2-light-blue-palette, 600, 300, 600);
+$warn: mat.m2-define-palette(mat.$m2-deep-orange-palette, 300, 500, 800);
 
-$theme: mat-light-theme($primary, $accent, $warn);
+$theme: mat.m2-define-light-theme((
+  color: (
+    primary: $primary,
+    accent: $accent,
+    warn: $warn,
+  )
+));
 
 // Include all theme styles for the components.
-@include angular-material-theme($theme);
+@include mat.all-component-themes($theme);
 
 
 .spinner-container {

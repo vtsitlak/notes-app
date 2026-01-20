@@ -8,8 +8,7 @@ export const selectAuthState =
 
 export const isLoggedIn = createSelector(
     selectAuthState,
-    auth => !!auth.user
-
+    (auth: AuthState | undefined) => !!auth?.user
 );
 
 

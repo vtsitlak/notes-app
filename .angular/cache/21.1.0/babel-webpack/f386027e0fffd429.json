@@ -1,0 +1,1 @@
+{"ast":null,"code":"import { MatDialogConfig } from '@angular/material/dialog';\nexport function defaultDialogConfig() {\n  const dialogConfig = new MatDialogConfig();\n  dialogConfig.disableClose = true;\n  dialogConfig.autoFocus = true;\n  dialogConfig.width = '400px';\n  return dialogConfig;\n}","map":null,"metadata":{},"sourceType":"module","externalDependencies":[]}

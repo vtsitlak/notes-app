@@ -7,33 +7,33 @@ import { Router } from '@angular/router';
 
 @Injectable()
 export class AuthEffects {
+    private actions$: Actions;
+    private router: Router;
 
-    login$ = createEffect(() =>
-        this.actions$
-            .pipe(
-                ofType(AuthActions.login),
-                tap(action => localStorage.setItem('user',
-                    JSON.stringify(action.user))
-                )
+    login$ = createEffect(() => {
+        return this.actions$.pipe(
+            ofType(AuthActions.login),
+            tap(action => localStorage.setItem('user',
+                JSON.stringify(action.user))
             )
-        ,
-        { dispatch: false });
+        );
+    }, { dispatch: false });
 
-    logout$ = createEffect(() =>
-        this.actions$
-            .pipe(
-                ofType(AuthActions.logout),
-                tap(action => {
-                    localStorage.removeItem('user');
-                    this.router.navigateByUrl('/login');
-                })
-            )
-        , { dispatch: false });
+    logout$ = createEffect(() => {
+        return this.actions$.pipe(
+            ofType(AuthActions.logout),
+            tap(action => {
+                localStorage.removeItem('user');
+                this.router.navigateByUrl('/login');
+            })
+        );
+    }, { dispatch: false });
 
-
-    constructor(private actions$: Actions,
-                private router: Router) {
-
+    constructor(
+        actions$: Actions,
+        router: Router
+    ) {
+        this.actions$ = actions$;
+        this.router = router;
     }
-
 }

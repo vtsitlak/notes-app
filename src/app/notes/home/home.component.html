@@ -14,7 +14,7 @@
 
     <mat-tab label="All Notes">
 
-      <notes-table-list (noteChanged)="reload()" [notes]="notes$ | async">
+      <notes-table-list (noteChanged)="reload()" [notes]="notesStore.notes()">
 
       </notes-table-list>
 
@@ -22,7 +22,7 @@
 
     <mat-tab label="Important">
 
-      <notes-table-list (noteChanged)="reload()" [notes]="importantNotes$ | async"></notes-table-list>      
+      <notes-table-list (noteChanged)="reload()" [notes]="notesStore.importantNotes()"></notes-table-list>      
 
     </mat-tab>
 

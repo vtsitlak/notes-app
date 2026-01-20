@@ -5,7 +5,9 @@ import { Note } from '../model/note';
 import { map } from 'rxjs/operators';
 
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class NotesHttpService {
 
     constructor(private http: HttpClient) {
@@ -13,7 +15,7 @@ export class NotesHttpService {
     }
 
     findAllNotes(): Observable<Note[]> {
-        return this.http.get('/api/notes')
+        return this.http.get<Note[]>('/api/notes')
             .pipe(
                 map((notes: Note[]) => notes)
             );

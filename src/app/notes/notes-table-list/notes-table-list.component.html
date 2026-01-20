@@ -1,5 +1,5 @@
 <mat-form-field class="notes-filter">
-  <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter on Title">
+  <input matInput (keyup)="applyFilter($any($event.target).value)" placeholder="Filter on Title">
 </mat-form-field>
 
 <table mat-table [dataSource]="dataSource" multiTemplateDataRows matSort class="mat-elevation-z8">

@@ -4,7 +4,7 @@
 
   <ng-container *ngIf="form">
 
-    <div class="spinner-container" *ngIf="loading$ | async">
+    <div class="spinner-container" *ngIf="notesStore.loading()">
 
       <mat-spinner></mat-spinner>
 
@@ -41,7 +41,7 @@
     Close
   </button>
 
-  <button mat-raised-button color="primary" [disabled]="!form?.valid || (this.loading$ | async)" (click)="onSave()">
+  <button mat-raised-button color="primary" [disabled]="!form.valid || notesStore.loading()" (click)="onSave()">
     Save
   </button>
 

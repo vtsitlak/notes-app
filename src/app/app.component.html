@@ -3,12 +3,12 @@
     <mat-sidenav #start>
         <mat-nav-list (click)="start.close()">
 
-            <a mat-list-item routerLink="/login" *ngIf="isLoggedOut$ | async">
+            <a mat-list-item routerLink="/login" *ngIf="authStore.isLoggedOut()">
                 <mat-icon>account_circle</mat-icon>
                 <span>Login</span>
             </a>
 
-            <a mat-list-item (click)="logout()" *ngIf="isLoggedIn$ | async">
+            <a mat-list-item (click)="logout()" *ngIf="authStore.isLoggedIn()">
                 <mat-icon>exit_to_app</mat-icon>
                 <span>Logout</span>
             </a>

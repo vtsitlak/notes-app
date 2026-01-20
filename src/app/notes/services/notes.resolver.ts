@@ -1,31 +1,17 @@
-import {Injectable} from '@angular/core';
-import {ActivatedRouteSnapshot, Resolve, RouterStateSnapshot} from '@angular/router';
-import {Observable} from 'rxjs';
-import {NoteEntityService} from './note-entity.service';
-import {filter, first, tap} from 'rxjs/operators';
+import { Injectable, inject } from '@angular/core';
+import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from '@angular/router';
+import { NotesStore } from '../notes.store';
 
-
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class NotesResolver implements Resolve<boolean> {
+    private notesStore = inject(NotesStore);
 
-    constructor(private notesService: NoteEntityService) {
-
+    resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
+        if (!this.notesStore.loaded()) {
+            this.notesStore.loadAll();
+        }
+        return true;
     }
-
-    resolve(route: ActivatedRouteSnapshot,
-            state: RouterStateSnapshot): Observable<boolean> {
-
-        return this.notesService.loaded$
-            .pipe(
-                tap(loaded => {
-                    if (!loaded) {
-                       this.notesService.getAll();
-                    }
-                }),
-                filter(loaded => !!loaded),
-                first()
-            );
-
-    }
-
 }

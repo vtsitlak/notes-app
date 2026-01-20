@@ -3,7 +3,9 @@ import { EntityCollectionServiceBase, EntityCollectionServiceElementsFactory } f
 import { Note } from '../model/note';
 
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class NoteEntityService
     extends EntityCollectionServiceBase<Note> {
 

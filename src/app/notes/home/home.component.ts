@@ -1,44 +1,36 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
 import { Note } from '../model/note';
-import { Observable } from 'rxjs';
 import { defaultDialogConfig } from '../shared/default-dialog-config';
 import { EditNoteDialogComponent } from '../edit-note-dialog/edit-note-dialog.component';
-import { MatDialog } from '@angular/material';
-import { map } from 'rxjs/operators';
-import { NoteEntityService } from '../services/note-entity.service';
+import { MatDialog } from '@angular/material/dialog';
+import { MatMiniFabButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatTabGroup, MatTab } from '@angular/material/tabs';
+import { NotesTableListComponent } from '../notes-table-list/notes-table-list.component';
+import { NotesStore } from '../notes.store';
 
 
 @Component({
-  selector: 'home',
-  templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'home',
+    templateUrl: './home.component.html',
+    styleUrls: ['./home.component.scss'],
+    standalone: true,
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [MatMiniFabButton, MatIcon, MatTooltip, MatTabGroup, MatTab, NotesTableListComponent]
 })
 export class HomeComponent implements OnInit {
 
-  notes$: Observable<Note[]>;
+  notesStore = inject(NotesStore);
 
-  importantNotes$: Observable<Note[]>;
-
-  constructor(
-    private dialog: MatDialog,
-    private notesService: NoteEntityService) {
-
-  }
+  constructor(private dialog: MatDialog) {}
 
   ngOnInit() {
     this.reload();
   }
 
   reload() {
-
-    this.notes$ = this.notesService.entities$;
-
-    this.importantNotes$ = this.notesService.entities$
-      .pipe(
-        map(notes => notes.filter(note => note.important === true))
-      );
-
+    this.notesStore.loadAll();
   }
 
   onAddCourse() {
