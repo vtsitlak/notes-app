@@ -27,6 +27,20 @@
       "body": "Lots of friends recommended to see 'Into the Wild' movie",
       "important": false,
       "created": "Sat Jan 11 2020 15:10:37 GMT+0100 (Central European Standard Time)"
+    },
+    {
+      "title": "test",
+      "body": "note text",
+      "important": false,
+      "created": "2026-01-24T15:52:04.796Z",
+      "id": 5
+    },
+    {
+      "title": "new one",
+      "body": "wow",
+      "important": false,
+      "created": "2026-01-24T16:12:09.650Z",
+      "id": 6
     }
   ]
 }

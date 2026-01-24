@@ -1,8 +1,8 @@
-<div class="notes-panel">
+<div class="max-w-[700px] min-w-[350px] mx-auto">
 
-  <div class="header">
+  <div class="flex justify-center items-center">
 
-    <h2 class="title">All Notes</h2>
+    <h2 class="text-center mr-4 font-roboto">All Notes</h2>
 
     <button mat-mini-fab>
       <mat-icon class="add-note-btn" (click)="onAddCourse()" matTooltip="Create new Note">add</mat-icon>
@@ -14,7 +14,7 @@
 
     <mat-tab label="All Notes">
 
-      <notes-table-list (noteChanged)="reload()" [notes]="notesStore.notes()">
+      <notes-table-list (noteChanged)="reload()" [notes]="notesFacade.notes()">
 
       </notes-table-list>
 
@@ -22,7 +22,7 @@
 
     <mat-tab label="Important">
 
-      <notes-table-list (noteChanged)="reload()" [notes]="notesStore.importantNotes()"></notes-table-list>      
+      <notes-table-list (noteChanged)="reload()" [notes]="notesFacade.importantNotes()"></notes-table-list>      
 
     </mat-tab>
 

@@ -1,45 +1,9 @@
-.notes-filter {
-  width: 100%;
-}
-
-
-table {
-  width: 100%;
-}
-
-::ng-deep .mat-cell:last-of-type {
+// Material-specific deep styles - using regular CSS for Material internal class overrides
+:host ::ng-deep .mat-cell:last-of-type {
   text-align: right;
 }
 
-tr.note-detail-row {
-  height: 0;
-}
-
-tr.note-row:not(.note-expanded-row):hover {
-  background: #777;
-  cursor: pointer;
-}
-
-tr.note-row:not(.note-expanded-row):active {
-  background: #efefef;
-}
-
-.note-row td {
-  border-bottom-width: 0;
-}
-
-.note-detail {
-  overflow: hidden;
-  display: flex;
-}
-
-.note-description {
-  // padding: 16px;
-  text-align: left;
-  width: 80%;
-}
-
-.note-actions {
-  text-align: right;
-  width: 20%;
+// Override Material styles for hidden detail rows
+.note-detail-row.hidden {
+  display: none !important;
 }

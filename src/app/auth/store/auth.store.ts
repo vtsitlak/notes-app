@@ -1,7 +1,7 @@
 import { signalStore, withState, withMethods, patchState, withComputed } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { inject } from '@angular/core';
-import { User } from './model/user.model';
+import { User } from '../model/user.model';
 import { AuthService } from './auth.service';
 import { Router } from '@angular/router';
 import { tap } from 'rxjs/operators';

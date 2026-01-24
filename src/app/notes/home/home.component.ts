@@ -8,29 +8,30 @@ import { MatIcon } from '@angular/material/icon';
 import { MatTooltip } from '@angular/material/tooltip';
 import { MatTabGroup, MatTab } from '@angular/material/tabs';
 import { NotesTableListComponent } from '../notes-table-list/notes-table-list.component';
-import { NotesStore } from '../notes.store';
+import { NotesFacade } from '../store/notes.facade';
 
 
 @Component({
     selector: 'home',
     templateUrl: './home.component.html',
     styleUrls: ['./home.component.scss'],
-    standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [MatMiniFabButton, MatIcon, MatTooltip, MatTabGroup, MatTab, NotesTableListComponent]
 })
 export class HomeComponent implements OnInit {
 
-  notesStore = inject(NotesStore);
-
-  constructor(private dialog: MatDialog) {}
+  notesFacade = inject(NotesFacade);
+  private dialog = inject(MatDialog);
 
   ngOnInit() {
-    this.reload();
+    // Only load if data hasn't been loaded yet
+    if (!this.notesFacade.loaded()) {
+      this.notesFacade.loadAll();
+    }
   }
 
   reload() {
-    this.notesStore.loadAll();
+    this.notesFacade.loadAll();
   }
 
   onAddCourse() {

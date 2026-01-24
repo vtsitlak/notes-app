@@ -1,13 +1,21 @@
-<mat-card class="login-page">
+<mat-card class="max-w-[350px] mx-auto mt-[50px]">
     <mat-card-title>Login</mat-card-title>
     <mat-card-content>
-        <form [formGroup]="form" class="login-form">
+        <form class="flex flex-col gap-4">
 
             <mat-form-field>
 
                 <input matInput type="email"
                        placeholder="Email"
-                       formControlName="email">
+                       [formField]="loginForm.email">
+                
+                @if (loginForm.email().touched() && loginForm.email().invalid()) {
+                    <mat-error>
+                        @for (error of loginForm.email().errors(); track error) {
+                            {{ error.message }}
+                        }
+                    </mat-error>
+                }
 
             </mat-form-field>
 
@@ -15,13 +23,21 @@
 
                 <input matInput type="password"
                        placeholder="Password"
-                       formControlName="password">
+                       [formField]="loginForm.password">
+                
+                @if (loginForm.password().touched() && loginForm.password().invalid()) {
+                    <mat-error>
+                        @for (error of loginForm.password().errors(); track error) {
+                            {{ error.message }}
+                        }
+                    </mat-error>
+                }
 
             </mat-form-field>
 
             <button mat-raised-button color="primary"
                     (click)="login()"
-                    [disabled]="!form.valid">Login</button>
+                    [disabled]="loginForm().invalid()">Login</button>
 
         </form>
     </mat-card-content>

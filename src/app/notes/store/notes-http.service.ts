@@ -30,5 +30,9 @@ export class NotesHttpService {
         return this.http.put('/api/notes/' + noteId, changes);
     }
 
+    createNote(note: Omit<Note, 'id'> | Note): Observable<Note> {
+        return this.http.post<Note>('/api/notes', note);
+    }
+
 
 }

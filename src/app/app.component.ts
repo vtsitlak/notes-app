@@ -1,5 +1,4 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { RouterOutlet, RouterLink, Router } from '@angular/router';
 import { NavigationCancel, NavigationEnd, NavigationError, NavigationStart } from '@angular/router';
 import { MatSidenavContainer, MatSidenav } from '@angular/material/sidenav';
@@ -8,15 +7,13 @@ import { MatIcon } from '@angular/material/icon';
 import { MatToolbar } from '@angular/material/toolbar';
 import { MatIconButton } from '@angular/material/button';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
-import { AuthStore } from './auth/auth.store';
+import { AuthFacade } from './auth/store/auth.facade';
 
 @Component({
     selector: 'app-root',
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss'],
-    standalone: true,
     imports: [
-        CommonModule,
         RouterOutlet,
         RouterLink,
         MatSidenavContainer,
@@ -35,16 +32,15 @@ export class AppComponent implements OnInit {
 
     loading = true;
 
-    authStore = inject(AuthStore);
-
-    constructor(private router: Router) {}
+    authFacade = inject(AuthFacade);
+    private router = inject(Router);
 
     ngOnInit() {
 
         const userProfile = localStorage.getItem('user');
 
         if (userProfile) {
-            this.authStore.setUser(JSON.parse(userProfile));
+            this.authFacade.setUser(JSON.parse(userProfile));
         }
 
         this.router.events.subscribe(event => {
@@ -68,7 +64,7 @@ export class AppComponent implements OnInit {
     }
 
     logout() {
-        this.authStore.logout();
+        this.authFacade.logout();
     }
 
 }

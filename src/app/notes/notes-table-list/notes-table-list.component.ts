@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ViewChild, OnChanges, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output, viewChild, effect, inject, afterNextRender } from '@angular/core';
 import { Note } from '../model/note';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
@@ -7,9 +7,9 @@ import { MatTableDataSource, MatTable, MatColumnDef, MatHeaderCellDef, MatHeader
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { EditNoteDialogComponent } from '../edit-note-dialog/edit-note-dialog.component';
 import { defaultDialogConfig } from '../shared/default-dialog-config';
-import { NotesStore } from '../notes.store';
+import { NotesFacade } from '../store/notes.facade';
 import { MatFormField, MatInput } from '@angular/material/input';
-import { NgFor, NgIf, DatePipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { MatIcon } from '@angular/material/icon';
 import { MatTooltip } from '@angular/material/tooltip';
 import { MatIconButton } from '@angular/material/button';
@@ -18,7 +18,6 @@ import { MatIconButton } from '@angular/material/button';
     selector: 'notes-table-list',
     templateUrl: './notes-table-list.component.html',
     styleUrls: ['./notes-table-list.component.scss'],
-    standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
     animations: [
         trigger('detailExpand', [
@@ -33,14 +32,12 @@ import { MatIconButton } from '@angular/material/button';
         MatInput,
         MatTable,
         MatSort,
-        NgFor,
         MatColumnDef,
         MatHeaderCellDef,
         MatHeaderCell,
         MatSortHeader,
         MatCellDef,
         MatCell,
-        NgIf,
         MatIcon,
         MatTooltip,
         MatIconButton,
@@ -52,15 +49,12 @@ import { MatIconButton } from '@angular/material/button';
         DatePipe,
     ],
 })
-export class NotesTableListComponent implements OnChanges {
+export class NotesTableListComponent {
+  notes = input<Note[]>([]);
+  noteChanged = output<void>();
 
-  @Input()
-  notes!: Note[];
-
-  @Output()
-  noteChanged = new EventEmitter();
-
-  notesStore = inject(NotesStore);
+  notesFacade = inject(NotesFacade);
+  private dialog = inject(MatDialog);
 
   columnsToDisplay = ['title', 'created', 'important'];
   expandedNote: Note | null = null;
@@ -70,22 +64,19 @@ export class NotesTableListComponent implements OnChanges {
     important: '',
   };
 
-  dataSource!: MatTableDataSource<Note>;
+  paginator = viewChild(MatPaginator);
+  sort = viewChild(MatSort);
 
-  @ViewChild(MatPaginator, { static: true }) paginator!: MatPaginator;
-  @ViewChild(MatSort, { static: true }) sort!: MatSort;
+  dataSource = new MatTableDataSource<Note>([]);
 
-  constructor(private dialog: MatDialog) {
-  }
+  constructor() {
+    // Initialize dataSource when notes change
+    effect(() => {
+      const notes = this.notes();
+      this.dataSource.data = notes;
 
-  ngOnChanges() {
-    this.dataSource = new MatTableDataSource(this.notes);
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
-
-    // custom filter, search only on Title column
-    this.dataSource.filterPredicate =
-      (note: Note, filters: string) => {
+      // custom filter, search only on Title column
+      this.dataSource.filterPredicate = (note: Note, filters: string) => {
         const matchFilter: boolean[] = [];
         const filterArray = filters.split(',');
         const columns = [note.title];
@@ -95,7 +86,23 @@ export class NotesTableListComponent implements OnChanges {
           matchFilter.push(customFilter.some(Boolean));
         });
         return matchFilter.every(Boolean);
-      }
+      };
+    });
+
+    // Update paginator and sort when they become available
+    afterNextRender(() => {
+      effect(() => {
+        const paginator = this.paginator();
+        const sort = this.sort();
+        
+        if (paginator) {
+          this.dataSource.paginator = paginator;
+        }
+        if (sort) {
+          this.dataSource.sort = sort;
+        }
+      });
+    });
   }
 
   applyFilter(filterValue: string) {
@@ -107,7 +114,6 @@ export class NotesTableListComponent implements OnChanges {
   }
 
   editCourse(note: Note) {
-
     const dialogConfig = defaultDialogConfig();
 
     dialogConfig.data = {
@@ -119,7 +125,6 @@ export class NotesTableListComponent implements OnChanges {
     this.dialog.open(EditNoteDialogComponent, dialogConfig)
       .afterClosed()
       .subscribe(() => this.noteChanged.emit());
-
   }
 
   onDeleteCourse(note: Note) {

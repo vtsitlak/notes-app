@@ -1,8 +1,8 @@
 import { signalStore, withState, withMethods, patchState, withComputed } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { inject } from '@angular/core';
-import { Note } from './model/note';
-import { NotesHttpService } from './services/notes-http.service';
+import { Note } from '../model/note';
+import { NotesHttpService } from './notes-http.service';
 import { pipe, switchMap, tap } from 'rxjs';
 
 interface NotesState {
@@ -56,13 +56,13 @@ export const NotesStore = signalStore(
         )
       )
     ),
-    add: rxMethod<Note>(
+    add: rxMethod<Omit<Note, 'id'> | Note>(
       pipe(
         switchMap((note) =>
-          notesHttpService.saveNote(note.id, note).pipe(
-            tap(() => {
+          notesHttpService.createNote(note).pipe(
+            tap((createdNote) => {
               patchState(store, (state) => ({
-                notes: [...state.notes, note]
+                notes: [...state.notes, createdNote]
               }));
             })
           )

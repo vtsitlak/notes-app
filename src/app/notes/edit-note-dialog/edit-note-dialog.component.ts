@@ -1,12 +1,11 @@
-import { ChangeDetectionStrategy, Component, Inject, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialogTitle, MatDialogContent, MatDialogActions } from '@angular/material/dialog';
 import { Note } from '../model/note';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { NotesStore } from '../notes.store';
+import { form, FormField, required } from '@angular/forms/signals';
+import { NotesFacade } from '../store/notes.facade';
 import { CdkScrollable } from '@angular/cdk/scrolling';
-import { NgIf } from '@angular/common';
-import { MatProgressSpinner } from '@angular/material/progress-spinner';
-import { MatFormField, MatInput } from '@angular/material/input';
+import { MatProgressSpinner, MatSpinner } from '@angular/material/progress-spinner';
+import { MatFormField, MatInput, MatError } from '@angular/material/input';
 import { MatSlideToggle } from '@angular/material/slide-toggle';
 import { MatButton } from '@angular/material/button';
 
@@ -14,65 +13,51 @@ import { MatButton } from '@angular/material/button';
     selector: 'note-dialog',
     templateUrl: './edit-note-dialog.component.html',
     styleUrls: ['./edit-note-dialog.component.scss'],
-    standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [MatDialogTitle, CdkScrollable, MatDialogContent, NgIf, MatProgressSpinner, ReactiveFormsModule, MatFormField, MatInput, MatSlideToggle, MatDialogActions, MatButton]
+    imports: [MatDialogTitle, CdkScrollable, MatDialogContent, MatProgressSpinner, MatSpinner, FormField, MatFormField, MatInput, MatError, MatSlideToggle, MatDialogActions, MatButton]
 })
 export class EditNoteDialogComponent {
+    private dialogRef = inject(MatDialogRef<EditNoteDialogComponent>);
+    private data = inject(MAT_DIALOG_DATA);
+    notesFacade = inject(NotesFacade);
 
-    form!: FormGroup;
+    dialogTitle = this.data.dialogTitle;
+    note = this.data.note || {} as Note;
+    mode = this.data.mode;
 
-    dialogTitle!: string;
+    noteModel = signal({
+        title: this.mode === 'update' ? this.note.title || '' : '',
+        body: this.mode === 'update' ? this.note.body || '' : '',
+        important: this.mode === 'update' ? this.note.important || false : false
+    });
 
-    note!: Note;
-
-    mode!: 'create' | 'update';
-
-    notesStore = inject(NotesStore);
-
-    constructor(
-        private fb: FormBuilder,
-        private dialogRef: MatDialogRef<EditNoteDialogComponent>,
-        @Inject(MAT_DIALOG_DATA) data: any) {
-
-        this.dialogTitle = data.dialogTitle;
-        this.note = data.note;
-        this.mode = data.mode;
-
-        const formControls = {
-            title: ['', Validators.required],
-            body: ['', Validators.required],
-            important: [false, Validators.required],
-        };
-
-        if (this.mode === 'update') {
-            this.form = this.fb.group(formControls);
-            this.form.patchValue({ ...data.note });
-        } else if (this.mode === 'create') {
-            this.form = this.fb.group({
-                ...formControls,
-            });
-        }
-    }
+    noteForm = form(this.noteModel, (schemaPath) => {
+        required(schemaPath.title, { message: 'Title is required' });
+        required(schemaPath.body, { message: 'Body is required' });
+    });
 
     onClose() {
         this.dialogRef.close();
     }
 
     onSave() {
-
-        const note: Note = {
-            ...this.note,
-            ...this.form.value
-        };
+        const formData = this.noteModel();
 
         if (this.mode === 'update') {
-            this.notesStore.update({ noteId: note.id, changes: this.form.value });
+            const note: Note = {
+                ...this.note,
+                ...formData
+            };
+            this.notesFacade.update(note.id, formData);
             this.dialogRef.close();
         } else if (this.mode === 'create') {
-            note.created = new Date().toISOString();
-            note.id = Math.max(...this.notesStore.notes().map(n => n.id), 0) + 1;
-            this.notesStore.add(note);
+            const newNote: Omit<Note, 'id'> = {
+                title: formData.title,
+                body: formData.body,
+                important: formData.important,
+                created: new Date().toISOString()
+            };
+            this.notesFacade.add(newNote);
             this.dialogRef.close();
         }
     }
