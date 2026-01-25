@@ -9,10 +9,13 @@ This project has been migrated to **Angular 21** with **standalone components** 
 NotesApp is a demo note managing application that demonstrates modern Angular development practices including:
 - **Angular 21** with standalone components (no NgModules)
 - **Angular Material** for UI components
-- **Angular Animations** for smooth transitions
+- **Tailwind CSS** for utility-first styling
+- **Native CSS Animations** for smooth transitions (replacing deprecated Angular animations)
+- **Angular Signal Forms** for reactive form handling
 - **TypeScript 5.9** for type safety
 - **RxJS 7.8** for reactive programming
-- **NgRx Signals** for signal-based state management
+- **NgRx Signal Store** for signal-based state management
+- **Facade Pattern** for clean API abstraction
 - **Express** and **json-server** for the REST API backend
 
 The application was originally based on NgRx (with NgRx Data) but has been modernized to use **NgRx Signal Store**, Angular's new signal-based state management solution.
@@ -21,10 +24,16 @@ The application was originally based on NgRx (with NgRx Data) but has been moder
 
 - ✅ **Angular 21** - Latest Angular version with standalone components
 - ✅ **Signal Store** - Modern signal-based state management (replacing NgRx Store)
-- ✅ **Standalone Components** - No NgModules, all components are standalone
+- ✅ **Standalone Components** - No NgModules, all components are standalone by default
+- ✅ **Signal-based APIs** - Using `input()`, `output()`, and `viewChild()` signals
+- ✅ **Angular Signal Forms** - Modern reactive forms with signal-based validation
+- ✅ **Tailwind CSS** - Utility-first CSS framework for rapid UI development
+- ✅ **Native CSS Animations** - Using CSS Grid transitions instead of deprecated Angular animations
+- ✅ **Facade Pattern** - Clean API layer for components to interact with stores
 - ✅ **TypeScript 5.9** - Latest TypeScript features
 - ✅ **Angular Material 21** - Material Design components
 - ✅ **Signal-based Reactivity** - No async pipes needed, direct signal access
+- ✅ **Modern Dependency Injection** - Using `inject()` function instead of constructor injection
 
 ## Installation Prerequisites
 
@@ -104,17 +113,22 @@ src/app/
 ├── app.config.ts            # Application configuration (providers)
 ├── app.routes.ts            # Route definitions
 ├── auth/
-│   ├── auth.store.ts        # Signal Store for authentication
-│   ├── auth.service.ts      # Authentication HTTP service
-│   ├── auth.guard.ts        # Route guard using Signal Store
-│   ├── login/               # Login component (standalone)
+│   ├── store/
+│   │   ├── auth.store.ts     # Signal Store for authentication
+│   │   ├── auth.service.ts  # Authentication HTTP service
+│   │   └── auth.facade.ts   # Facade for auth store
+│   ├── auth.guard.ts        # Route guard using AuthFacade
+│   ├── login/               # Login component (uses Signal Forms)
 │   └── model/               # User model
 └── notes/
-    ├── notes.store.ts       # Signal Store for notes
+    ├── store/
+    │   ├── notes.store.ts    # Signal Store for notes
+    │   ├── notes-http.service.ts  # HTTP service for notes
+    │   └── notes.facade.ts   # Facade for notes store
     ├── home/                # Home component (standalone)
-    ├── notes-table-list/    # Notes table component (standalone)
-    ├── edit-note-dialog/    # Edit note dialog (standalone)
-    ├── services/            # HTTP services
+    ├── notes-table-list/    # Notes table component (uses signal inputs/outputs)
+    ├── edit-note-dialog/    # Edit note dialog (uses Signal Forms)
+    ├── shared/              # Shared utilities
     └── model/               # Note model
 ```
 
@@ -122,31 +136,87 @@ src/app/
 
 ### Standalone Components
 
-All components are standalone (no NgModules). Each component imports its own dependencies:
+All components are standalone by default (no `standalone: true` needed in Angular 21). Each component imports its own dependencies:
 
 ```typescript
 @Component({
   selector: 'app-example',
-  standalone: true,
-  imports: [CommonModule, MatButton, MatIcon],
+  imports: [MatButton, MatIcon],
   // ...
 })
 ```
 
+### Signal-based Component APIs
+
+Components use modern signal-based APIs instead of decorators:
+
+```typescript
+export class ExampleComponent {
+  // Signal inputs/outputs instead of @Input/@Output
+  data = input<string>();
+  change = output<void>();
+  
+  // Signal viewChild instead of @ViewChild
+  paginator = viewChild(MatPaginator);
+  
+  // inject() instead of constructor injection
+  private service = inject(ExampleService);
+}
+```
+
+### Angular Signal Forms
+
+Forms use Angular's new Signal Forms API:
+
+```typescript
+import { form, FormField, required } from '@angular/forms/signals';
+
+loginModel = signal({ email: '', password: '' });
+
+loginForm = form(this.loginModel, (schemaPath) => {
+  required(schemaPath.email, { message: 'Email is required' });
+  required(schemaPath.password, { message: 'Password is required' });
+});
+```
+
 ### Signal Store
 
-The application uses **NgRx Signal Store** for state management:
+The application uses **NgRx Signal Store** for state management with a **Facade Pattern** for clean API abstraction:
 
-#### Auth Store (`auth.store.ts`)
+#### Auth Store (`auth/store/auth.store.ts`)
 - Manages user authentication state
 - Methods: `login()`, `logout()`, `setUser()`
 - Computed signals: `isLoggedIn()`, `isLoggedOut()`
+- Accessed via `AuthFacade` in components
 
-#### Notes Store (`notes.store.ts`)
+#### Notes Store (`notes/store/notes.store.ts`)
 - Manages notes collection
-- Methods: `loadAll()`, `update()`, `add()`
+- Methods: `loadAll()`, `update()`, `add()`, `delete()`
 - Computed signals: `importantNotes()`
 - State signals: `notes()`, `loading()`, `loaded()`
+- Accessed via `NotesFacade` in components
+
+#### Facade Pattern
+
+Facades provide a clean API layer for components:
+
+```typescript
+// Components use facades instead of accessing stores directly
+export class NotesFacade {
+  private readonly store = inject(NotesStore);
+  
+  readonly notes = this.store.notes;
+  readonly loading = this.store.loading;
+  
+  loadAll(): void {
+    this.store.loadAll();
+  }
+  
+  delete(noteId: string | number): void {
+    this.store.delete(noteId);
+  }
+}
+```
 
 ### Application Configuration
 
@@ -161,6 +231,17 @@ export const appConfig: ApplicationConfig = {
   ]
 };
 ```
+
+### Styling
+
+The application uses **Tailwind CSS** for utility-first styling:
+
+- **Tailwind CSS 4.0** - Modern utility-first CSS framework
+- **PostCSS** - CSS processing with Tailwind plugin
+- **Material Integration** - Tailwind configured to work alongside Angular Material
+- **Native CSS Animations** - CSS Grid-based transitions for smooth animations
+
+Styles are primarily applied using Tailwind utility classes in templates, with minimal component-specific SCSS for Material overrides.
 
 ### Bootstrap
 
@@ -215,13 +296,19 @@ ng e2e
 - `@angular/core`: ^21.0.0
 - `@angular/router`: ^21.0.0
 - `@angular/material`: ^21.0.0
+- `@angular/forms`: ^21.0.0 (includes Signal Forms)
 - `@ngrx/signals`: ^21.0.1
 - `rxjs`: ^7.8.1
 - `typescript`: ~5.9.0
+- `zone.js`: ^0.15.0
 
 ### Development Dependencies
 - `@angular/cli`: ^21.0.0
 - `@angular-devkit/build-angular`: ^21.0.0
+- `tailwindcss`: ^4.0.0
+- `@tailwindcss/postcss`: ^4.0.0
+- `postcss`: ^8.4.47
+- `autoprefixer`: ^10.4.20
 - `karma`: ^6.4.4
 - `jasmine-core`: ^5.4.0
 
@@ -232,13 +319,27 @@ This project was migrated from:
 - **NgModules** → **Standalone Components**
 - **NgRx Store** → **NgRx Signal Store**
 - **Observables with async pipe** → **Signals**
+- **Reactive Forms** → **Signal Forms**
+- **@Input/@Output** → **input()/output()**
+- **@ViewChild** → **viewChild()**
+- **Constructor injection** → **inject()**
+- **Angular Animations** → **Native CSS Animations**
+- **Custom CSS** → **Tailwind CSS**
 
 ### What Changed
 
-1. **Removed NgModules**: All `@NgModule` decorators removed, components are now standalone
+1. **Removed NgModules**: All `@NgModule` decorators removed, components are now standalone by default
 2. **Signal Store**: Replaced NgRx Store/Effects with Signal Store for simpler, signal-based state management
-3. **Direct Signal Access**: Components access state directly via signals instead of observables
-4. **Simplified Configuration**: Removed NgRx Store, Effects, Router Store, and Entity Data providers
+3. **Facade Pattern**: Introduced facades (`AuthFacade`, `NotesFacade`) for clean API abstraction
+4. **Signal-based APIs**: Migrated to `input()`, `output()`, and `viewChild()` signals
+5. **Signal Forms**: Replaced Reactive Forms with Angular Signal Forms
+6. **Dependency Injection**: Using `inject()` function instead of constructor injection
+7. **Native CSS Animations**: Replaced deprecated Angular animations with CSS Grid-based transitions
+8. **Tailwind CSS**: Integrated Tailwind CSS 4.0 for utility-first styling
+9. **Direct Signal Access**: Components access state directly via signals instead of observables
+10. **Simplified Configuration**: Removed NgRx Store, Effects, Router Store, and Entity Data providers
+11. **Modern Control Flow**: Using `@if`, `@for` instead of `*ngIf`, `*ngFor`
+12. **CRUD Operations**: Added delete functionality to complete CRUD operations
 
 ## Troubleshooting
 
