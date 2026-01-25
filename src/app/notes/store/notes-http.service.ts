@@ -34,5 +34,8 @@ export class NotesHttpService {
         return this.http.post<Note>('/api/notes', note);
     }
 
+    deleteNote(noteId: string | number): Observable<void> {
+        return this.http.delete<void>(`/api/notes/${noteId}`);
+    }
 
 }

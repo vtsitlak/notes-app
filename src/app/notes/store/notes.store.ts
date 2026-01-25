@@ -68,6 +68,19 @@ export const NotesStore = signalStore(
           )
         )
       )
+    ),
+    delete: rxMethod<string | number>(
+      pipe(
+        switchMap((noteId) =>
+          notesHttpService.deleteNote(noteId).pipe(
+            tap(() => {
+              patchState(store, (state) => ({
+                notes: state.notes.filter(n => n.id !== noteId)
+              }));
+            })
+          )
+        )
+      )
     )
   }))
 );

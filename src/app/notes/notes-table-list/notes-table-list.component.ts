@@ -94,7 +94,7 @@ export class NotesTableListComponent {
       effect(() => {
         const paginator = this.paginator();
         const sort = this.sort();
-        
+
         if (paginator) {
           this.dataSource.paginator = paginator;
         }
@@ -128,9 +128,7 @@ export class NotesTableListComponent {
   }
 
   onDeleteCourse(note: Note) {
-    // Note: Delete functionality would need to be added to NotesStore
-    // For now, just emit the change event
-    this.noteChanged.emit();
+    this.notesFacade.delete(note.id);
   }
 
 }

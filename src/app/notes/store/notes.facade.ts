@@ -30,4 +30,8 @@ export class NotesFacade {
   add(note: Omit<Note, 'id'> | Note): void {
     this.store.add(note);
   }
+
+  delete(noteId: string | number): void {
+    this.store.delete(noteId);
+  }
 }
