@@ -280,6 +280,32 @@ npm test
 ng test
 ```
 
+The project includes comprehensive unit tests for all components, services, facades, and guards:
+
+- **Component Tests**: All components have corresponding `.spec.ts` files using Angular 21 testing patterns
+  - `app.component.spec.ts` - Root component tests
+  - `auth/login/login.component.spec.ts` - Login component with Signal Forms tests
+  - `notes/home/home.component.spec.ts` - Home component tests
+  - `notes/notes-table-list/notes-table-list.component.spec.ts` - Notes table component tests
+  - `notes/edit-note-dialog/edit-note-dialog.component.spec.ts` - Edit dialog component tests
+
+- **Service Tests**: HTTP services are tested with `HttpTestingController`
+  - `auth/store/auth.service.spec.ts` - Authentication service tests
+  - `notes/store/notes-http.service.spec.ts` - Notes HTTP service tests
+
+- **Facade Tests**: Facades are tested with spy objects
+  - `auth/store/auth.facade.spec.ts` - Auth facade tests
+  - `notes/store/notes.facade.spec.ts` - Notes facade tests
+
+- **Guard Tests**: Route guards are tested
+  - `auth/auth.guard.spec.ts` - Authentication guard tests
+
+All tests use:
+- `TestBed.configureTestingModule` with standalone component imports
+- `provideRouter()` and `provideAnimations()` for providers
+- Jasmine spy objects for mocking dependencies
+- Signal-based testing patterns for Angular 21
+
 ### End-to-End Tests
 
 Run e2e tests:
@@ -310,7 +336,12 @@ ng e2e
 - `postcss`: ^8.4.47
 - `autoprefixer`: ^10.4.20
 - `karma`: ^6.4.4
+- `karma-coverage`: ^2.2.1
+- `karma-jasmine`: ^5.1.0
+- `karma-jasmine-html-reporter`: ^2.1.0
+- `karma-chrome-launcher`: ^3.2.0
 - `jasmine-core`: ^5.4.0
+- `@types/jasmine`: ^5.1.4
 
 ## Migration Notes
 
