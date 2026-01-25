@@ -4,7 +4,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortHeader } from '@angular/material/sort';
 import { MatTableDataSource, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow } from '@angular/material/table';
-import { animate, state, style, transition, trigger } from '@angular/animations';
 import { EditNoteDialogComponent } from '../edit-note-dialog/edit-note-dialog.component';
 import { defaultDialogConfig } from '../shared/default-dialog-config';
 import { NotesFacade } from '../store/notes.facade';
@@ -19,14 +18,6 @@ import { MatIconButton } from '@angular/material/button';
     templateUrl: './notes-table-list.component.html',
     styleUrls: ['./notes-table-list.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    animations: [
-        trigger('detailExpand', [
-            state('collapsed, void', style({ height: '0px' })),
-            state('expanded', style({ height: '*' })),
-            transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
-            transition('expanded <=> void', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)'))
-        ]),
-    ],
     imports: [
         MatFormField,
         MatInput,
