@@ -1,13 +1,6 @@
 {
   "notes": [
     {
-      "id": 1,
-      "title": "mobile bill",
-      "body": "I have to pay my mobile phone bill",
-      "important": true,
-      "created": "Sat Jan 11 2020 18:20:37 GMT+0100 (Central European Standard Time)"
-    },
-    {
       "id": 2,
       "title": "shopping",
       "body": "Out of coffee and cheese",

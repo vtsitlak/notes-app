@@ -12,7 +12,14 @@ interface AuthState {
 }
 
 const initialState: AuthState = {
-  user: null
+  user: (() => {
+    try {
+      const u = localStorage.getItem('user');
+      return u ? JSON.parse(u) : null;
+    } catch {
+      return null;
+    }
+  })()
 };
 
 export const AuthStore = signalStore(

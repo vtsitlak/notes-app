@@ -1,5 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { form, FormField, required } from '@angular/forms/signals';
+import { FormsModule } from '@angular/forms';
 import { MatCard, MatCardTitle, MatCardContent } from '@angular/material/card';
 import { MatFormField, MatInput, MatError } from '@angular/material/input';
 import { MatButton } from '@angular/material/button';
@@ -9,7 +10,7 @@ import { AuthFacade } from '../store/auth.facade';
     selector: 'login',
     templateUrl: './login.component.html',
     styleUrls: ['./login.component.scss'],
-    imports: [MatCard, MatCardTitle, MatCardContent, FormField, MatFormField, MatInput, MatError, MatButton]
+    imports: [FormsModule, MatCard, MatCardTitle, MatCardContent, FormField, MatFormField, MatInput, MatError, MatButton]
 })
 export class LoginComponent {
     authFacade = inject(AuthFacade);

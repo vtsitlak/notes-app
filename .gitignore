@@ -43,6 +43,9 @@ testem.log
 
 # Angular cache
 /.angular
+/.angular/cache
+.angular
+.angular/cache
 
 # System Files
 .DS_Store
