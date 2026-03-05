@@ -4,6 +4,7 @@ import { AppComponent } from './app.component';
 import { AuthFacade } from './auth/store/auth.facade';
 import { provideRouter } from '@angular/router';
 import { User } from './auth/model/user.model';
+import { Subject } from 'rxjs';
 
 describe('AppComponent', () => {
   let component: AppComponent;
@@ -18,7 +19,7 @@ describe('AppComponent', () => {
       user: jasmine.createSpy().and.returnValue(null)
     });
     const routerSpy = jasmine.createSpyObj('Router', ['navigateByUrl'], {
-      events: jasmine.createSpy().and.returnValue({ subscribe: jasmine.createSpy() })
+      events: new Subject()
     });
 
     await TestBed.configureTestingModule({

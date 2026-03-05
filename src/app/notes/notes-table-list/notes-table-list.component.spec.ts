@@ -22,9 +22,10 @@ describe('NotesTableListComponent', () => {
       notes: signal(mockNotes),
       loading: signal(false)
     });
-    const dialogSpy = jasmine.createSpyObj('MatDialog', ['open'], {
-      afterClosed: jasmine.createSpy().and.returnValue({ subscribe: jasmine.createSpy() })
-    });
+    const dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
+    dialogRefSpy.afterClosed.and.returnValue({ subscribe: jasmine.createSpy() });
+    const dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
+    dialogSpy.open.and.returnValue(dialogRefSpy);
 
     await TestBed.configureTestingModule({
       imports: [NotesTableListComponent],

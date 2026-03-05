@@ -5,7 +5,7 @@ import { User } from '../model/user.model';
 
 describe('AuthFacade', () => {
   let facade: AuthFacade;
-  let store: jasmine.SpyObj<AuthStore>;
+  let store: jasmine.SpyObj<InstanceType<typeof AuthStore>>;
 
   beforeEach(() => {
     const storeSpy = jasmine.createSpyObj('AuthStore', ['login', 'logout', 'setUser'], {
@@ -22,7 +22,7 @@ describe('AuthFacade', () => {
     });
 
     facade = TestBed.inject(AuthFacade);
-    store = TestBed.inject(AuthStore) as jasmine.SpyObj<AuthStore>;
+    store = TestBed.inject(AuthStore) as jasmine.SpyObj<InstanceType<typeof AuthStore>>;
   });
 
   it('should be created', () => {
@@ -54,7 +54,7 @@ describe('AuthFacade', () => {
   });
 
   it('should call store.setUser when setUser is called', () => {
-    const user: User = { id: 1, email: 'test@email.com' };
+    const user: User = { id: '1', name: 'Test User', email: 'test@email.com' };
     facade.setUser(user);
     
     expect(store.setUser).toHaveBeenCalledWith(user);

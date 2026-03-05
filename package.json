@@ -7,8 +7,7 @@
     "build": "ng build",
     "server": "cross-env NODE_OPTIONS=--disable-warning=DEP0060 ts-node -P ./server/server.tsconfig.json ./server/server.ts",
     "test": "cross-env NODE_OPTIONS=--disable-warning=DEP0060 ng test",
-    "lint": "ng lint",
-    "e2e": "ng e2e"
+    "lint": "ng lint"
   },
   "private": true,
   "overrides": {
