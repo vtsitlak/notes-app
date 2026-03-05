@@ -1,1 +1,0 @@
-{"ast":null,"code":"export function compareNotes(c1, c2) {\n  const compare = c1.id - c2.id;\n  if (compare > 0) {\n    return 1;\n  } else if (compare < 0) {\n    return -1;\n  } else {\n    return 0;\n  }\n}","map":null,"metadata":{},"sourceType":"module","externalDependencies":[]}
