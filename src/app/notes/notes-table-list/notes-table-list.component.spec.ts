@@ -89,8 +89,17 @@ describe('NotesTableListComponent', () => {
   });
 
   it('should format created dates safely', () => {
-    expect(component.formatCreated('2024-01-15T00:00:00.000Z')).toBe('15/01/2024');
+    expect(component.formatCreated('2024-01-15')).toBe('15/01/2024');
     expect(component.formatCreated(null)).toBe('');
     expect(component.formatCreated(undefined)).toBe('');
+    expect(component.formatCreated('not-a-date')).toBe('');
+  });
+
+  it('should clear expandedNote when notes input changes', () => {
+    component.expandedNote = mockNotes[0];
+    fixture.componentRef.setInput('notes', mockNotes);
+    fixture.detectChanges();
+
+    expect(component.expandedNote).toBeNull();
   });
 });

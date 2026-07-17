@@ -59,9 +59,14 @@ describe('HomeComponent', () => {
     expect(notesFacade.loadAll).toHaveBeenCalled();
   });
 
-  it('should open dialog when onAddCourse is called', () => {
+  it('should open create dialog with expected data', () => {
     component.onAddCourse();
-    
-    expect(dialog.open).toHaveBeenCalled();
+
+    expect(dialog.open).toHaveBeenCalledWith(
+      jasmine.any(Function),
+      jasmine.objectContaining({
+        data: { dialogTitle: 'Create Note', mode: 'create' }
+      })
+    );
   });
 });

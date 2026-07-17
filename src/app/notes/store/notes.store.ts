@@ -3,7 +3,8 @@ import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { computed, inject, Injector } from '@angular/core';
 import { Note } from '../model/note';
 import { NotesHttpService } from './notes-http.service';
-import { pipe, switchMap, tap } from 'rxjs';
+import { pipe, switchMap, tap, catchError, of } from 'rxjs';
+
 
 interface NotesState {
   notes: Note[];
@@ -33,13 +34,12 @@ export const NotesStore = signalStore(
           tap(() => patchState(store, { loading: true })),
           switchMap(() =>
             notesHttpService.findAllNotes().pipe(
-              tap({
-                next: (notes) => {
-                  patchState(store, { notes, loading: false, loaded: true });
-                },
-                error: () => {
-                  patchState(store, { loading: false });
-                }
+              tap((notes) => {
+                patchState(store, { notes, loading: false, loaded: true });
+              }),
+              catchError(() => {
+                patchState(store, { loading: false });
+                return of([]);
               })
             )
           )

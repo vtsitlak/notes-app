@@ -276,21 +276,49 @@ Build artifacts are stored in `dist/notes-app/`.
 
 ```bash
 npm test
+# or headless single run:
+npx ng test --watch=false --browsers=ChromeHeadless
 ```
 
-The project includes unit tests for components, services, facades, and guards. Karma coverage requires `istanbul-lib-instrument` (included in devDependencies for Angular 22).
+Specs cover components, services, facades, guards, and Signal Stores:
 
-Tests use:
+| Area | Spec files |
+|------|------------|
+| App shell | `app.component.spec.ts` |
+| Auth | `login.component.spec.ts`, `auth.guard.spec.ts`, `auth.service.spec.ts`, `auth.facade.spec.ts`, `auth.store.spec.ts` |
+| Notes | `home.component.spec.ts`, `notes-table-list.component.spec.ts`, `edit-note-dialog.component.spec.ts`, `notes-http.service.spec.ts`, `notes.facade.spec.ts`, `notes.store.spec.ts` |
 
-- `TestBed.configureTestingModule` with standalone component imports
-- `provideRouter()` and `provideHttpClient()` / `provideHttpClientTesting()`
-- Jasmine spy objects for facades and services
+Karma coverage uses `istanbul-lib-instrument` (required as an explicit peer on Angular 22).
 
-### End-to-End Tests
+### End-to-End Tests (Playwright)
+
+Protractor was removed (unsupported on Angular 22). E2E uses **Playwright**.
+
+1. Install browsers once:
+
+```bash
+npx playwright install chromium
+```
+
+2. Start the API server (required for login):
+
+```bash
+npm run server
+```
+
+3. Run e2e tests (Playwright starts `npm start` if needed):
 
 ```bash
 npm run e2e
 ```
+
+Optional UI mode:
+
+```bash
+npm run e2e:ui
+```
+
+Covered flows: login page, login → notes, logout, open create-note dialog.
 
 ## Key Dependencies
 
@@ -315,6 +343,7 @@ npm run e2e
 | `tailwindcss` | ^4.0.0 |
 | `karma` + `karma-coverage` | ^6.4.4 / ^2.2.1 |
 | `istanbul-lib-instrument` | ^6.0.3 |
+| `@playwright/test` | ^1.61.1 |
 | `@types/json-server` | ^0.14.8 |
 
 ## Migration Notes

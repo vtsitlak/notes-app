@@ -8,7 +8,7 @@ const router = jsonServer.router(path.join(__dirname, 'db.json'));
 
 server.use(jsonServer.defaults());
 server.use(jsonServer.bodyParser);
-server.route('/api/login').post(loginUser);
+server.post('/api/login', loginUser);
 server.use('/api', router);
 
 const httpServer = server.listen(9000, () => {
