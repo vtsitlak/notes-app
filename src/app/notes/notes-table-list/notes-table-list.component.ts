@@ -1,44 +1,35 @@
-import { ChangeDetectionStrategy, Component, input, output, viewChild, effect, inject, afterNextRender } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output, viewChild, effect, inject } from '@angular/core';
+import { formatDate } from '@angular/common';
 import { Note } from '../model/note';
 import { MatDialog } from '@angular/material/dialog';
-import { MatPaginator } from '@angular/material/paginator';
-import { MatSort, MatSortHeader } from '@angular/material/sort';
-import { MatTableDataSource, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow } from '@angular/material/table';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatSort, MatSortModule } from '@angular/material/sort';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatButtonModule } from '@angular/material/button';
 import { EditNoteDialogComponent } from '../edit-note-dialog/edit-note-dialog.component';
 import { defaultDialogConfig } from '../shared/default-dialog-config';
 import { NotesFacade } from '../store/notes.facade';
-import { MatFormField, MatInput } from '@angular/material/input';
-import { DatePipe } from '@angular/common';
-import { MatIcon } from '@angular/material/icon';
-import { MatTooltip } from '@angular/material/tooltip';
-import { MatIconButton } from '@angular/material/button';
 
 @Component({
-    selector: 'notes-table-list',
-    templateUrl: './notes-table-list.component.html',
-    styleUrls: ['./notes-table-list.component.scss'],
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [
-        MatFormField,
-        MatInput,
-        MatTable,
-        MatSort,
-        MatColumnDef,
-        MatHeaderCellDef,
-        MatHeaderCell,
-        MatSortHeader,
-        MatCellDef,
-        MatCell,
-        MatIcon,
-        MatTooltip,
-        MatIconButton,
-        MatHeaderRowDef,
-        MatHeaderRow,
-        MatRowDef,
-        MatRow,
-        MatPaginator,
-        DatePipe,
-    ],
+  selector: 'notes-table-list',
+  templateUrl: './notes-table-list.component.html',
+  styleUrls: ['./notes-table-list.component.scss'],
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    MatFormFieldModule,
+    MatInputModule,
+    MatTableModule,
+    MatSortModule,
+    MatPaginatorModule,
+    MatIconModule,
+    MatTooltipModule,
+    MatButtonModule,
+  ],
 })
 export class NotesTableListComponent {
   notes = input<Note[]>([]);
@@ -61,10 +52,11 @@ export class NotesTableListComponent {
   dataSource = new MatTableDataSource<Note>([]);
 
   constructor() {
-    // Initialize dataSource when notes change
     effect(() => {
       const notes = this.notes();
       this.dataSource.data = notes;
+      // Drop stale object identity after store reload/update
+      this.expandedNote = null;
 
       // custom filter, search only on Title column
       this.dataSource.filterPredicate = (note: Note, filters: string) => {
@@ -80,20 +72,30 @@ export class NotesTableListComponent {
       };
     });
 
-    // Update paginator and sort when they become available
-    afterNextRender(() => {
-      effect(() => {
-        const paginator = this.paginator();
-        const sort = this.sort();
+    // viewChild signals update when available; keep effect in constructor injection context
+    effect(() => {
+      const paginator = this.paginator();
+      const sort = this.sort();
 
-        if (paginator) {
-          this.dataSource.paginator = paginator;
-        }
-        if (sort) {
-          this.dataSource.sort = sort;
-        }
-      });
+      if (paginator) {
+        this.dataSource.paginator = paginator;
+      }
+      if (sort) {
+        this.dataSource.sort = sort;
+      }
     });
+  }
+
+  formatCreated(value: string | Date | null | undefined): string {
+    if (!value) {
+      return '';
+    }
+
+    try {
+      return formatDate(value, 'dd/MM/yyyy', 'en-US');
+    } catch {
+      return '';
+    }
   }
 
   applyFilter(filterValue: string) {
@@ -110,10 +112,11 @@ export class NotesTableListComponent {
     dialogConfig.data = {
       dialogTitle: 'Edit Note',
       note,
-      mode: 'update'
+      mode: 'update',
     };
 
-    this.dialog.open(EditNoteDialogComponent, dialogConfig)
+    this.dialog
+      .open(EditNoteDialogComponent, dialogConfig)
       .afterClosed()
       .subscribe(() => this.noteChanged.emit());
   }
@@ -121,14 +124,4 @@ export class NotesTableListComponent {
   onDeleteCourse(note: Note) {
     this.notesFacade.delete(note.id);
   }
-
 }
-
-
-
-
-
-
-
-
-

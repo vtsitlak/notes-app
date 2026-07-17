@@ -62,7 +62,7 @@ describe('NotesHttpService', () => {
     service.saveNote(1, changes).subscribe();
 
     const req = httpMock.expectOne('/api/notes/1');
-    expect(req.request.method).toBe('PUT');
+    expect(req.request.method).toBe('PATCH');
     expect(req.request.body).toEqual(changes);
     req.flush({});
   });

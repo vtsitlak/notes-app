@@ -46,7 +46,7 @@ describe('AppComponent', () => {
   });
 
   it('should initialize loading as true', () => {
-    expect(component.loading).toBe(true);
+    expect(component.loading()).toBe(true);
   });
 
   it('should call authFacade.setUser if user exists in localStorage', () => {
@@ -68,7 +68,12 @@ describe('AppComponent', () => {
 
   it('should call authFacade.logout when logout is called', () => {
     component.logout();
-    
+
     expect(authFacade.logout).toHaveBeenCalled();
+  });
+
+  it('should expose auth state signals from the facade', () => {
+    expect(component.isLoggedIn).toBe(authFacade.isLoggedIn);
+    expect(component.isLoggedOut).toBe(authFacade.isLoggedOut);
   });
 });

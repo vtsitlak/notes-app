@@ -87,4 +87,10 @@ describe('NotesTableListComponent', () => {
     expect(component.label['created']).toBe('Date Created');
     expect(component.label['important']).toBe('');
   });
+
+  it('should format created dates safely', () => {
+    expect(component.formatCreated('2024-01-15T00:00:00.000Z')).toBe('15/01/2024');
+    expect(component.formatCreated(null)).toBe('');
+    expect(component.formatCreated(undefined)).toBe('');
+  });
 });

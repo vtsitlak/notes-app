@@ -9,7 +9,7 @@
       <td mat-cell *matCellDef="let note">
         @if (column !== 'important') {
           @if (column === 'created') {
-            {{ note[column] | date: 'dd/MM/yyyy' }}
+            {{ formatCreated(note[column]) }}
           } @else {
             {{note[column]}}
           }

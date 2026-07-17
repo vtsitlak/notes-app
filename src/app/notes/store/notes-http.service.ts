@@ -27,7 +27,9 @@ export class NotesHttpService {
 
 
     saveNote(noteId: string | number, changes: Partial<Note>) {
-        return this.http.put('/api/notes/' + noteId, changes);
+        // PATCH keeps fields not included in `changes` (e.g. created).
+        // PUT would replace the whole record and wipe missing properties.
+        return this.http.patch('/api/notes/' + noteId, changes);
     }
 
     createNote(note: Omit<Note, 'id'> | Note): Observable<Note> {

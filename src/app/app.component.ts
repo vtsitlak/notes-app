@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { RouterOutlet, RouterLink, Router } from '@angular/router';
 import { NavigationCancel, NavigationEnd, NavigationError, NavigationStart } from '@angular/router';
 import { MatSidenavContainer, MatSidenav } from '@angular/material/sidenav';
@@ -7,12 +7,14 @@ import { MatIcon } from '@angular/material/icon';
 import { MatToolbar } from '@angular/material/toolbar';
 import { MatIconButton } from '@angular/material/button';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { MatTooltip } from '@angular/material/tooltip';
 import { AuthFacade } from './auth/store/auth.facade';
 
 @Component({
     selector: 'app-root',
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         RouterOutlet,
         RouterLink,
@@ -23,6 +25,7 @@ import { AuthFacade } from './auth/store/auth.facade';
         MatIcon,
         MatToolbar,
         MatIconButton,
+        MatTooltip,
         MatProgressSpinner
     ]
 })
@@ -30,10 +33,14 @@ export class AppComponent implements OnInit {
 
     title = 'Notes App';
 
-    loading = true;
+    loading = signal(true);
 
-    authFacade = inject(AuthFacade);
+    private authFacade = inject(AuthFacade);
     private router = inject(Router);
+
+    // Expose store signals on the component so OnPush templates stay in sync after login
+    readonly isLoggedIn = this.authFacade.isLoggedIn;
+    readonly isLoggedOut = this.authFacade.isLoggedOut;
 
     ngOnInit() {
 
@@ -46,14 +53,14 @@ export class AppComponent implements OnInit {
         this.router.events.subscribe(event => {
             switch (true) {
                 case event instanceof NavigationStart: {
-                    this.loading = true;
+                    this.loading.set(true);
                     break;
                 }
 
                 case event instanceof NavigationEnd:
                 case event instanceof NavigationCancel:
                 case event instanceof NavigationError: {
-                    this.loading = false;
+                    this.loading.set(false);
                     break;
                 }
                 default: {

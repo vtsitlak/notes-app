@@ -1,5 +1,5 @@
-
 import * as jsonServer from 'json-server';
+import { AddressInfo } from 'net';
 import { loginUser } from './auth.route';
 
 const server = jsonServer.create();
@@ -12,5 +12,6 @@ server.route('/api/login').post(loginUser);
 server.use('/api', router);
 
 const httpServer = server.listen(9000, () => {
-    console.log('HTTP REST API Server running at http://localhost:' + httpServer.address().port);
+    const address = httpServer.address() as AddressInfo;
+    console.log('HTTP REST API Server running at http://localhost:' + address.port);
 });

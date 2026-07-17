@@ -1,6 +1,6 @@
 import { signalStore, withState, withMethods, patchState, withComputed } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { inject } from '@angular/core';
+import { computed, inject, Injector } from '@angular/core';
 import { User } from '../model/user.model';
 import { AuthService } from './auth.service';
 import { Router } from '@angular/router';
@@ -26,30 +26,37 @@ export const AuthStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
   withComputed((store) => ({
-    isLoggedIn: () => !!store.user(),
-    isLoggedOut: () => !store.user()
+    isLoggedIn: computed(() => !!store.user()),
+    isLoggedOut: computed(() => !store.user())
   })),
-  withMethods((store, authService = inject(AuthService), router = inject(Router)) => ({
-    login: rxMethod<{ email: string; password: string }>(
-      pipe(
-        switchMap(({ email, password }) =>
-          authService.login(email, password).pipe(
-            tap((user) => {
-              patchState(store, { user });
-              localStorage.setItem('user', JSON.stringify(user));
-              router.navigateByUrl('/notes');
-            })
+  withMethods((store) => {
+    const authService = inject(AuthService);
+    const router = inject(Router);
+    const injector = inject(Injector);
+
+    return {
+      login: rxMethod<{ email: string; password: string }>(
+        pipe(
+          switchMap(({ email, password }) =>
+            authService.login(email, password).pipe(
+              tap((user) => {
+                patchState(store, { user });
+                localStorage.setItem('user', JSON.stringify(user));
+                router.navigateByUrl('/notes');
+              })
+            )
           )
-        )
-      )
-    ),
-    logout: () => {
-      patchState(store, { user: null });
-      localStorage.removeItem('user');
-      router.navigateByUrl('/login');
-    },
-    setUser: (user: User) => {
-      patchState(store, { user });
-    }
-  }))
+        ),
+        { injector }
+      ),
+      logout: () => {
+        patchState(store, { user: null });
+        localStorage.removeItem('user');
+        router.navigateByUrl('/login');
+      },
+      setUser: (user: User) => {
+        patchState(store, { user });
+      }
+    };
+  })
 );
